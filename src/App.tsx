@@ -1,11 +1,21 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import { Button } from "@/components/ui/button";
-
+import Layout from "./components/layout";
+import { ThemeProvider } from "./context/them-provider";
+import WeatherDashboard from "./pages/weather-dashboard";
+import CityPage from "./pages/city-page";
 function App() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-svh">
-      <Button>Click me</Button>
-    </div>
+    <BrowserRouter>
+      <ThemeProvider defaultTheme="system">
+        <Layout>
+          <Routes>
+            <Route path="/" element={<WeatherDashboard />} />
+            <Route path="/city/:cityName" element={<CityPage />} />
+          </Routes>
+        </Layout>
+      </ThemeProvider>
+    </BrowserRouter>
   );
 }
 
