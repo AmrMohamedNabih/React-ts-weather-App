@@ -1,5 +1,7 @@
 import CurrentWeather from "@/components/current-weather";
 import ErrorAlert from "@/components/error-alert";
+import HourlyTemperature from "@/components/hourly-temperature";
+
 import LoadingSkeleton from "@/components/loading-skeleton";
 import { Button } from "@/components/ui/button";
 import { useGeoLocation } from "@/hooks/use-geolocatiob";
@@ -73,10 +75,9 @@ function WeatherDashboard() {
         </Button>
       </div>
       <div className="grid gap-6">
-        <div>
+        <div className="flex flex-col lg:flex-row gap-4">
           <CurrentWeather data={weatherQuery.data} location={locationName} />
-          {/* curr weather */}
-          {/* hourly temperature */}
+          <HourlyTemperature data={forecastQuery.data} />
         </div>
         <div>
           {/* details */}
