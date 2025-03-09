@@ -1,5 +1,90 @@
+import CurrentWeather from "@/components/current-weather";
+import ErrorAlert from "@/components/error-alert";
+import LoadingSkeleton from "@/components/loading-skeleton";
+import { Button } from "@/components/ui/button";
+import { useGeoLocation } from "@/hooks/use-geolocatiob";
+import {
+  useForecastQuery,
+  useReversGeocodeQuery,
+  useWeatherQuery,
+} from "@/hooks/use-weather";
+import { RefreshCw } from "lucide-react";
+
 function WeatherDashboard() {
-  return <div>WeatherDashboard</div>;
+  const {
+    coordinates,
+    isLoading: LocationLoading,
+    error: LocationError,
+    getLocation,
+  } = useGeoLocation();
+
+  const weatherQuery = useWeatherQuery(coordinates);
+  const forecastQuery = useForecastQuery(coordinates);
+  const locationQuery = useReversGeocodeQuery(coordinates);
+
+  const handleRefresh = () => {
+    getLocation();
+    if (coordinates) {
+      weatherQuery.refetch();
+      forecastQuery.refetch();
+      locationQuery.refetch();
+    }
+  };
+
+  if (LocationLoading) {
+    return <LoadingSkeleton />;
+  }
+  if (LocationError || !coordinates) {
+    return (
+      <ErrorAlert
+        message={LocationError ? LocationError : "Location Permission Required"}
+      />
+    );
+  }
+  const locationName = locationQuery.data?.[0];
+  if (weatherQuery.error || forecastQuery.error) {
+    return (
+      <ErrorAlert
+        message={"Failed to fetch weather Information please try again"}
+      />
+    );
+  }
+  if (!weatherQuery.data || !forecastQuery.data) {
+    return <LoadingSkeleton />;
+  }
+  return (
+    <div className="space-y-4">
+      {/* favorites  */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold tracking-tight">My Location</h1>
+        <Button
+          variant={"outline"}
+          size={"icon"}
+          onClick={handleRefresh}
+          disabled={weatherQuery.isFetching || forecastQuery.isFetching}
+        >
+          <RefreshCw
+            className={`w-4 h-4 ${
+              weatherQuery.isFetching || forecastQuery.isFetching
+                ? "animate-spin"
+                : ""
+            }`}
+          />
+        </Button>
+      </div>
+      <div className="grid gap-6">
+        <div>
+          <CurrentWeather data={weatherQuery.data} location={locationName} />
+          {/* curr weather */}
+          {/* hourly temperature */}
+        </div>
+        <div>
+          {/* details */}
+          {/* forecast */}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default WeatherDashboard;
